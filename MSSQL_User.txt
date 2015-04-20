@@ -1,0 +1,5 @@
+Username : tuc48912
+Password : Aelol6jo
+DB : SP15_3342_tuc48912
+server : cis-mssql1.temple.edu
+\\cis-iis2.temple.edu\wwwroot$\Spring2015\CIS3342_tuc48912
