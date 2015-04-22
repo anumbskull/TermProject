@@ -6,6 +6,7 @@ using System.Web.Services;
 using Utilities;
 using System.Data;
 using System.Data.SqlClient;
+using TermClasses;
 
 namespace WebServices
 {
@@ -22,7 +23,7 @@ namespace WebServices
         DBConnect objDB = new DBConnect();
 
         [WebMethod]
-        public bool Login(String user, String pass)
+        public Customer Login(String user, String pass)
         {
             SqlCommand objCommand = new SqlCommand();
             objCommand.CommandType = CommandType.StoredProcedure;
@@ -42,18 +43,27 @@ namespace WebServices
 
             DataSet myDS = objDB.GetDataSetUsingCmdObj(objCommand);
 
+            Customer cust = new Customer();
+
             if (myDS.Tables[0].Rows.Count != 0)
             {
-                return true;
+                cust.Name = myDS.Tables[0].Rows[0]["CustomerName"].ToString();
+                cust.Email = myDS.Tables[0].Rows[0]["EmailAddress"].ToString();
+                cust.Shipping = myDS.Tables[0].Rows[0]["ShippingAddress"].ToString();
+                cust.City = myDS.Tables[0].Rows[0]["City"].ToString();
+                cust.State = myDS.Tables[0].Rows[0]["State"].ToString();
+                cust.Zip = (int)myDS.Tables[0].Rows[0]["Zip"];
+                cust.CustID = (int)myDS.Tables[0].Rows[0]["CustomerID"];
+                return cust;
             }
             else
             {
-                return false;
+                return null;
             }
         }
 
         [WebMethod]
-        public bool UserCreate(String user, String pass, String name, String address, String city, String state, int zip, String email)
+        public int FindUser(String user)
         {
             SqlCommand objCommand = new SqlCommand();
             objCommand.CommandType = CommandType.StoredProcedure;
@@ -69,15 +79,30 @@ namespace WebServices
 
             if (myDS.Tables[0].Rows.Count != 0)
             {
-                return false;
+                return int.Parse(myDS.Tables[0].Rows[0]["CustomerID"].ToString());
             }
             else
             {
-                objCommand = new SqlCommand();
+                return -1;
+            }
+        }
+
+        [WebMethod]
+        public int UserCreate(String user, String pass, Customer cust)
+        {
+            int pepe = FindUser(user);
+
+            if (pepe != -1)
+            {
+                return pepe;
+            }
+            else
+            {
+                SqlCommand objCommand = new SqlCommand();
                 objCommand.CommandType = CommandType.StoredProcedure;
                 objCommand.CommandText = "AddUser";
 
-                inputParameter = new SqlParameter("@user", user);
+                SqlParameter inputParameter = new SqlParameter("@user", user);
                 inputParameter.Direction = ParameterDirection.Input;
                 inputParameter.SqlDbType = SqlDbType.NVarChar;
                 inputParameter.Size = 50;
@@ -89,33 +114,33 @@ namespace WebServices
                 inputParameter.Size = 50;
                 objCommand.Parameters.Add(inputParameter);
 
-                inputParameter = new SqlParameter("@name", name);
+                inputParameter = new SqlParameter("@name", cust.Name);
                 inputParameter.Direction = ParameterDirection.Input;
                 inputParameter.SqlDbType = SqlDbType.NVarChar;
                 inputParameter.Size = 50;
                 objCommand.Parameters.Add(inputParameter);
 
-                inputParameter = new SqlParameter("@address", address);
+                inputParameter = new SqlParameter("@address", cust.Shipping);
                 inputParameter.Direction = ParameterDirection.Input;
                 inputParameter.SqlDbType = SqlDbType.NVarChar;
                 objCommand.Parameters.Add(inputParameter);
 
-                inputParameter = new SqlParameter("@city", city);
+                inputParameter = new SqlParameter("@city", cust.City);
                 inputParameter.Direction = ParameterDirection.Input;
                 inputParameter.SqlDbType = SqlDbType.NVarChar;
                 objCommand.Parameters.Add(inputParameter);
 
-                inputParameter = new SqlParameter("@state", state);
+                inputParameter = new SqlParameter("@state", cust.State);
                 inputParameter.Direction = ParameterDirection.Input;
                 inputParameter.SqlDbType = SqlDbType.NVarChar;
                 objCommand.Parameters.Add(inputParameter);
 
-                inputParameter = new SqlParameter("@zip", zip);
+                inputParameter = new SqlParameter("@zip", cust.Zip);
                 inputParameter.Direction = ParameterDirection.Input;
                 inputParameter.SqlDbType = SqlDbType.Int;
                 objCommand.Parameters.Add(inputParameter);
 
-                inputParameter = new SqlParameter("@email", email);
+                inputParameter = new SqlParameter("@email", cust.Email);
                 inputParameter.Direction = ParameterDirection.Input;
                 inputParameter.SqlDbType = SqlDbType.NVarChar;
                 inputParameter.Size = 50;
@@ -123,7 +148,9 @@ namespace WebServices
 
                 objDB.DoUpdateUsingCmdObj(objCommand);
 
-                return true;
+                pepe = FindUser(user);
+
+                return pepe;
             }
         }
     }

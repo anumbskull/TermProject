@@ -6,10 +6,11 @@ using System.Web.Services;
 using Utilities;
 using System.Data;
 using System.Data.SqlClient;
+using TermClasses;
 
 namespace WebServices
 {
-    
+
     /// <summary>
     /// Summary description for CarService
     /// </summary>
@@ -26,7 +27,7 @@ namespace WebServices
         DBConnect objDB = new DBConnect();
 
         [WebMethod]
-        public DataSet GetRentalCarAgencies(String city, String state) 
+        public DataSet GetRentalCarAgencies(String city, String state)
         {
             SqlCommand objCommand = new SqlCommand();
             objCommand.CommandType = CommandType.StoredProcedure;
@@ -198,13 +199,23 @@ namespace WebServices
         }
 
         [WebMethod]
-        public Boolean Reserve(int agencyid, int custid, int carid, DateTime start, DateTime end)
+        public Boolean Reserve(int agencyid, Customer cust, int carid, DateTime start, DateTime end)
         {
-            //WORKS!!!
-            
+            TermProjectWS TPWS = new TermProjectWS();
+            //checks to see if the user already has an id in data base
+            if (cust.CustID == null)
+            {
+                //adds user to data base
+                cust.CustID = TPWS.UserCreate(cust.Name + DateTime.Now.Millisecond, cust.Email, cust);
+            }
+
+            //find start date of reserves
+
+            DataSet Wojak = new DataSet();
+
             SqlCommand objCommand = new SqlCommand();
             objCommand.CommandType = CommandType.StoredProcedure;
-            objCommand.CommandText = "Reserve";
+            objCommand.CommandText = "AvailableToReserve";
 
             SqlParameter inputParameter = new SqlParameter("@agency", agencyid);
             inputParameter.Direction = ParameterDirection.Input;
@@ -212,62 +223,75 @@ namespace WebServices
             inputParameter.Size = 32;
             objCommand.Parameters.Add(inputParameter);
 
-            inputParameter = new SqlParameter("@car", carid);
+            inputParameter = new SqlParameter("@carID", agencyid);
             inputParameter.Direction = ParameterDirection.Input;
             inputParameter.SqlDbType = SqlDbType.Int;
             inputParameter.Size = 32;
             objCommand.Parameters.Add(inputParameter);
 
+            Wojak = objDB.GetDataSetUsingCmdObj(objCommand);
+            int pepe = 100;
 
-            inputParameter = new SqlParameter("@customer", custid);
-            inputParameter.Direction = ParameterDirection.Input;
-            inputParameter.SqlDbType = SqlDbType.Int;
-            inputParameter.Size = 32;
-            objCommand.Parameters.Add(inputParameter);
-
-            inputParameter = new SqlParameter("@start", start);
-            inputParameter.Direction = ParameterDirection.Input;
-            inputParameter.SqlDbType = SqlDbType.DateTime;
-            objCommand.Parameters.Add(inputParameter);
-
-            inputParameter = new SqlParameter("@end", end);
-            inputParameter.Direction = ParameterDirection.Input;
-            inputParameter.SqlDbType = SqlDbType.DateTime;
-            objCommand.Parameters.Add(inputParameter);
-
-            try
+            for (int row = 0; row > Wojak.Tables[0].Rows.Count; row++)
             {
-                objDB.DoUpdateUsingCmdObj(objCommand);
-                return true;
+                if ((DateTime)Wojak.Tables[0].Rows[row]["StartDate"] > start)
+                {
+                    pepe = row;
+                    break;
+                }
             }
-            catch
-            {
-                return false;
-            }
-            
-        }
 
-        [WebMethod]
-        public DataSet findCustomer(int custID, string user, string pass)
-        {
-            //WORKS!!!
-            DataSet myDS = new DataSet();
-            if (user == "NHMM" && pass == "Brewer")
+            if ((DateTime)Wojak.Tables[0].Rows[pepe]["StartDate"] < end && (DateTime)Wojak.Tables[0].Rows[pepe - 1]["EndDate"] > start)
             {
-                SqlCommand objCommand = new SqlCommand();
+                //call reserve
+                objCommand = new SqlCommand();
                 objCommand.CommandType = CommandType.StoredProcedure;
-                objCommand.CommandText = "FindCustomer";
+                objCommand.CommandText = "Reserve";
 
-                SqlParameter inputParameter = new SqlParameter("@cust", custID);
+                inputParameter = new SqlParameter("@agency", agencyid);
                 inputParameter.Direction = ParameterDirection.Input;
                 inputParameter.SqlDbType = SqlDbType.Int;
                 inputParameter.Size = 32;
                 objCommand.Parameters.Add(inputParameter);
 
-                myDS = objDB.GetDataSetUsingCmdObj(objCommand);
+                inputParameter = new SqlParameter("@car", carid);
+                inputParameter.Direction = ParameterDirection.Input;
+                inputParameter.SqlDbType = SqlDbType.Int;
+                inputParameter.Size = 32;
+                objCommand.Parameters.Add(inputParameter);
+
+                inputParameter = new SqlParameter("@customer", cust.CustID);
+                inputParameter.Direction = ParameterDirection.Input;
+                inputParameter.SqlDbType = SqlDbType.Int;
+                inputParameter.Size = 32;
+                objCommand.Parameters.Add(inputParameter);
+
+                inputParameter = new SqlParameter("@start", start);
+                inputParameter.Direction = ParameterDirection.Input;
+                inputParameter.SqlDbType = SqlDbType.DateTime;
+                objCommand.Parameters.Add(inputParameter);
+
+                inputParameter = new SqlParameter("@end", end);
+                inputParameter.Direction = ParameterDirection.Input;
+                inputParameter.SqlDbType = SqlDbType.DateTime;
+                objCommand.Parameters.Add(inputParameter);
+
+                try
+                {
+                    objDB.DoUpdateUsingCmdObj(objCommand);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
 
             }
-            return myDS;
+            else
+            {
+                return false;
+            }
+
         }
     }
 }

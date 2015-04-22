@@ -58,12 +58,14 @@ namespace Login
         {
             carWS = new CarService();
 
+            agencyclass = (Agency)Session["CarAgency"];
+
             String[] amenity = new String[] { txtNumDoors.Text, txtNumAirbags.Text, ddlPowerSteering.SelectedValue, txtNumSeats.Text, txtColor.Text, ddlGPS.SelectedValue };
             gdvFindCar.DataSource = carWS.FindCarsbyAgency(agencyclass.Agencyid, amenity, agencyclass.City, agencyclass.State);
             gdvFindCar.DataBind();
         }
 
-        protected void Button1_Click(object sender, EventArgs e)
+        protected void btnRent_Click(object sender, EventArgs e)
         {
             //TODO: Write code to find selected cars, and rent the car [Find Selected Cars = DONE]
             //TODO: Check to make sure it works.
@@ -83,11 +85,15 @@ namespace Login
                     rentalcar.Carmodel = gdvFindCar.Rows[row].Cells[4].Text;
 
                     //rent the car
-                    int custid = 0;
                     DateTime Start = new DateTime();
                     DateTime End = new DateTime();
 
-                    if (carWS.Reserve(rentalcar.Agencyid, custid, rentalcar.Carid, Start, End))
+                    Start = calStart.SelectedDate;
+                    End = calEnd.SelectedDate;
+
+                    Customer cust = (Customer)Session["Cust"];
+
+                    if (carWS.Reserve(rentalcar.Agencyid, cust, rentalcar.Carid, Start, End))
                     {
                         rentresults = rentresults + " The Car, " + rentalcar.Carid + " was successfully rented.";
                     }

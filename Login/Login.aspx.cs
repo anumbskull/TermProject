@@ -8,6 +8,7 @@ using WebServices;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Net.Mail;
+using TermClasses;
 
 namespace Project3
 {
@@ -54,10 +55,10 @@ namespace Project3
                 lblLoginError.Text = "You must have a password";
                 return;
             }
-
-            if (termWS.Login(txtUserName.Text, txtPassword.Text))
+            Customer cust = termWS.Login(txtUserName.Text, txtPassword.Text);
+            if (cust != null)
             {
-                Session["User"] = txtUserName.Text;
+                Session["Cust"] = cust;
                 if (rblCookies.SelectedValue.Equals("0"))
                 {
                     HttpCookie myCookie = new HttpCookie("CIS3342_Login");
@@ -153,12 +154,20 @@ namespace Project3
                 int zip = int.Parse(txtZipCreate.Text);
                 String email = txtEmailCreate.Text;
 
-                if (!termWS.UserCreate(user, pass, name, address, city, state, zip, email))
+                if (termWS.FindUser(user) != -1)
                 {
                     lblErorUsCreate.Text = "Username is already taken";
                     return;
                 }
-
+                Customer cust = new Customer();
+                cust.Name = name;
+                cust.Shipping = address;
+                cust.City = city;
+                cust.State = state;
+                cust.Zip = zip;
+                cust.Email = email;
+                cust.CustID = -1;
+                termWS.UserCreate(user, pass, cust);
                 Session["Login"] = user;
 
                 MultiView1.ActiveViewIndex = 2;

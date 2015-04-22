@@ -82,6 +82,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TermClasses\TermClasses.csproj">
+      <Project>{461bcea6-fc5c-4cde-a54f-1c0e983add2f}</Project>
+      <Name>TermClasses</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utilities\Utilities.csproj">
       <Project>{157d1b26-8bba-4386-8c91-0355f22ccc51}</Project>
       <Name>Utilities</Name>
