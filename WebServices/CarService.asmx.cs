@@ -223,25 +223,106 @@ namespace WebServices
             inputParameter.Size = 32;
             objCommand.Parameters.Add(inputParameter);
 
-            inputParameter = new SqlParameter("@carID", agencyid);
+            inputParameter = new SqlParameter("@carID", carid);
             inputParameter.Direction = ParameterDirection.Input;
             inputParameter.SqlDbType = SqlDbType.Int;
             inputParameter.Size = 32;
             objCommand.Parameters.Add(inputParameter);
 
             Wojak = objDB.GetDataSetUsingCmdObj(objCommand);
-            int pepe = 100;
+            int pepe = -1;
 
-            for (int row = 0; row > Wojak.Tables[0].Rows.Count; row++)
+
+
+            DateTime compStart;
+            DateTime compEnd;
+
+            if (Wojak.Tables[0].Rows.Count == 0)
             {
-                if ((DateTime)Wojak.Tables[0].Rows[row]["StartDate"] > start)
+                compStart = DateTime.Now.AddYears(1000);
+                compEnd = DateTime.Now.AddYears(-1000);
+            }
+            else if (Wojak.Tables[0].Rows.Count == 1)
+            {
+                if ((DateTime)Wojak.Tables[0].Rows[0]["StartDate"] > end || (DateTime)Wojak.Tables[0].Rows[0]["EndDate"] < start)
                 {
-                    pepe = row;
-                    break;
+                    //call reserve
+                    objCommand = new SqlCommand();
+                    objCommand.CommandType = CommandType.StoredProcedure;
+                    objCommand.CommandText = "Reserve";
+
+                    inputParameter = new SqlParameter("@agency", agencyid);
+                    inputParameter.Direction = ParameterDirection.Input;
+                    inputParameter.SqlDbType = SqlDbType.Int;
+                    inputParameter.Size = 32;
+                    objCommand.Parameters.Add(inputParameter);
+
+                    inputParameter = new SqlParameter("@car", carid);
+                    inputParameter.Direction = ParameterDirection.Input;
+                    inputParameter.SqlDbType = SqlDbType.Int;
+                    inputParameter.Size = 32;
+                    objCommand.Parameters.Add(inputParameter);
+
+                    inputParameter = new SqlParameter("@customer", cust.CustID);
+                    inputParameter.Direction = ParameterDirection.Input;
+                    inputParameter.SqlDbType = SqlDbType.Int;
+                    inputParameter.Size = 32;
+                    objCommand.Parameters.Add(inputParameter);
+
+                    inputParameter = new SqlParameter("@start", start);
+                    inputParameter.Direction = ParameterDirection.Input;
+                    inputParameter.SqlDbType = SqlDbType.DateTime;
+                    objCommand.Parameters.Add(inputParameter);
+
+                    inputParameter = new SqlParameter("@end", end);
+                    inputParameter.Direction = ParameterDirection.Input;
+                    inputParameter.SqlDbType = SqlDbType.DateTime;
+                    objCommand.Parameters.Add(inputParameter);
+
+                    try
+                    {
+                        objDB.DoUpdateUsingCmdObj(objCommand);
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                for (int row = 0; row < Wojak.Tables[0].Rows.Count; row++)
+                {
+                    if ((DateTime)Wojak.Tables[0].Rows[row]["StartDate"] > start)
+                    {
+                        pepe = row;
+                        break;
+                    }
+                }
+
+                if (pepe == 0)
+                {
+                    compStart = (DateTime)Wojak.Tables[0].Rows[pepe]["StartDate"];
+                    compEnd = DateTime.Now.AddYears(-1000);
+                }
+                else if (pepe == -1)
+                {
+                    compStart = DateTime.Now.AddYears(1000);
+                    compEnd = (DateTime)Wojak.Tables[0].Rows[Wojak.Tables[0].Rows.Count - 1]["EndDate"];
+                }
+                else
+                {
+                    compStart = (DateTime)Wojak.Tables[0].Rows[pepe]["StartDate"];
+                    compEnd = (DateTime)Wojak.Tables[0].Rows[pepe - 1]["EndDate"];
                 }
             }
 
-            if ((DateTime)Wojak.Tables[0].Rows[pepe]["StartDate"] < end && (DateTime)Wojak.Tables[0].Rows[pepe - 1]["EndDate"] > start)
+            if (compStart > end && compEnd < start)
             {
                 //call reserve
                 objCommand = new SqlCommand();
@@ -291,7 +372,6 @@ namespace WebServices
             {
                 return false;
             }
-
         }
     }
 }

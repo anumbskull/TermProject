@@ -72,7 +72,7 @@ namespace Login
             CheckBox CBox;
             carWS = new CarService();
             String rentresults = " ";
-            for (int row = 0; row < gdvGetAgency.Rows.Count; row++)
+            for (int row = 0; row < gdvFindCar.Rows.Count; row++)
             {
                 CBox = (CheckBox)gdvFindCar.Rows[row].FindControl("chkCar");
 
