@@ -85,47 +85,68 @@
         </asp:GridView>
 
         <asp:Button ID="btnSelect" runat="server" OnClick="btnSelect_Click" Text="Select" />
-        <p>
+        <br />
             <asp:Label ID="Label2" runat="server" Text="Please enter which amenities you would like. "></asp:Label>
-        </p>
-        <asp:Label ID="Label3" runat="server" Text="Number of Doors:"></asp:Label>
-        <div style="margin-left: 40px">
-            <asp:TextBox ID="txtNumDoors" runat="server" Width="123px"></asp:TextBox>
-        </div>
-        <asp:Label ID="Label4" runat="server" Text="Number of Airbags:"></asp:Label>
-        <div style="margin-left: 40px">
-            <asp:TextBox ID="txtNumAirbags" runat="server"></asp:TextBox>
-        </div>
-        <asp:Label ID="Label5" runat="server" Text="Power Steering?"></asp:Label>
-        <div style="margin-left: 40px">
-            <asp:DropDownList ID="ddlPowerSteering" runat="server">
+            <asp:Table ID="Table1" runat="server">
+                <asp:TableRow>
+                    <asp:TableCell>
+                        <asp:Label ID="Label3" runat="server" Text="Number of Doors:"></asp:Label>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Label ID="Label4" runat="server" Text="Number of Airbags:"></asp:Label>
+                    </asp:TableCell>
+                </asp:TableRow>
+                <asp:TableRow>
+                    <asp:TableCell>
+                        <asp:TextBox ID="txtNumDoors" runat="server" Width="123px"></asp:TextBox>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:TextBox ID="txtNumAirbags" runat="server"></asp:TextBox>
+                    </asp:TableCell>
+                </asp:TableRow>
+                <asp:TableRow>
+                    <asp:TableCell>
+                        <asp:Label ID="Label5" runat="server" Text="Power Steering?"></asp:Label>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Label ID="Label6" runat="server" Text="Number of Seats:"></asp:Label>
+                    </asp:TableCell>
+                </asp:TableRow>
+                <asp:TableRow>
+                    <asp:TableCell>
+                        <asp:DropDownList ID="ddlPowerSteering" runat="server">
                 <asp:ListItem Value="Select">Select one</asp:ListItem>
                 <asp:ListItem Value="true">Yes</asp:ListItem>
                 <asp:ListItem Value="false">No</asp:ListItem>
             </asp:DropDownList>
-        </div>
-        <asp:Label ID="Label6" runat="server" Text="Number of Seats:"></asp:Label>
-        <div style="margin-left: 40px">
-            <asp:TextBox ID="txtNumSeats" runat="server"></asp:TextBox>
-        </div>
-        <asp:Label ID="Label7" runat="server" Text="Desired Color:"></asp:Label>
-        <div style="margin-left: 40px">
-            <asp:TextBox ID="txtColor" runat="server"></asp:TextBox>
-        </div>
-        <asp:Label ID="Label8" runat="server" Text="GPS?"></asp:Label>
-        <div style="margin-left: 40px">
-            <asp:DropDownList ID="ddlGPS" runat="server">
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:TextBox ID="txtNumSeats" runat="server"></asp:TextBox>
+                    </asp:TableCell>
+                </asp:TableRow>
+                <asp:TableRow>
+                    <asp:TableCell>
+                        <asp:Label ID="Label7" runat="server" Text="Desired Color:"></asp:Label>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:Label ID="Label8" runat="server" Text="GPS?"></asp:Label>
+                    </asp:TableCell>
+                </asp:TableRow>
+                <asp:TableRow>
+                    <asp:TableCell>
+                        <asp:TextBox ID="txtColor" runat="server"></asp:TextBox>
+                    </asp:TableCell>
+                    <asp:TableCell>
+                        <asp:DropDownList ID="ddlGPS" runat="server">
                 <asp:ListItem Value="Select">Select one</asp:ListItem>
                 <asp:ListItem Value="true">Yes</asp:ListItem>
                 <asp:ListItem Value="false">No</asp:ListItem>
             </asp:DropDownList>
-        </div>
-        <p>
-            &nbsp;
-        </p>
-        <p>
+                    </asp:TableCell>
+                </asp:TableRow>
+            </asp:Table>
+        <br />
             <asp:Button ID="btnCarSearch" runat="server" OnClick="btnCarSearch_Click" Text="Search" />
-        </p>
 
         <asp:GridView ID="gdvFindCar" runat="server" AutoGenerateColumns="False">
             <Columns>
@@ -134,6 +155,8 @@
                         <asp:CheckBox ID="chkCar" runat="server" />
                     </ItemTemplate>
                 </asp:TemplateField>
+                <asp:ImageField DataImageUrlField="Picture" HeaderText="Picture">
+                </asp:ImageField>
                 <asp:BoundField DataField="CarID" HeaderText="CarID" />
                 <asp:BoundField DataField="AgencyID" HeaderText="AgencyID" />
                 <asp:BoundField DataField="CarMake" HeaderText="Make" />
@@ -142,11 +165,25 @@
         </asp:GridView>
 
         <br />
-        <asp:Label ID="Label9" runat="server" Text="Start"></asp:Label>
-        <asp:Calendar ID="calStart" runat="server"></asp:Calendar>
-        <br />
-        <asp:Label ID="Label10" runat="server" Text="End"></asp:Label>
-        <asp:Calendar ID="calEnd" runat="server"></asp:Calendar>
+        <asp:Table ID="Table2" runat="server">
+            <asp:TableRow>
+                <asp:TableCell>
+                    <asp:Label ID="Label9" runat="server" Text="Start"></asp:Label>
+                </asp:TableCell>
+                <asp:TableCell>
+                    <asp:Label ID="Label10" runat="server" Text="End"></asp:Label>
+                </asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
+                <asp:TableCell>
+                    <asp:Calendar ID="calStart" runat="server"></asp:Calendar>
+                </asp:TableCell>
+                <asp:TableCell>
+                    <asp:Calendar ID="calEnd" runat="server"></asp:Calendar>
+                </asp:TableCell>
+            </asp:TableRow>
+        </asp:Table>
+
         <br />
         <asp:Label ID="lblResults" runat="server"></asp:Label>
 
